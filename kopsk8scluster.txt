@@ -1,0 +1,52 @@
+install linux 
+
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+we will install kops on ubuntu
+
+wget https://github.com/kubernetes/kops/releases/download/1.6.1/kops-linux-amd64
+chmod +x kops-linux-amd64
+sudo mv kops-linux-amd64 /usr/local/bin/kops
+
+creting a domain on Route 53 for k8s cluster
+Kubernetes uses DNS for discovery inside the cluster so that you can reach out kubernetes API server from clients.
+
+create s3 bucket 
+
+aws s3 mb s3://clusters.k8s.appychip.vpc
+
+set env varaible with s3 url
+export KOPS_STATE_STORE=s3://clusters.k8s.appychip.vpc
+
+Create Kubernetes Cluster
+
+kops create cluster --cloud=aws --zones=us-east-1d --name=useast1.k8s.appychip.vpc --dns-zone=appychip.vpc --dns private
+
+You must have ssh keys which are already generated otherwise it will throw an error
+kops update cluster useast1.k8s.appychip.vpc --yes
+
+This will do all the required stuff of creating the VPC, subnets, autoscaling-groups, nodes etc
+
+To edit the cluster settings with one of these commands:
+
+    List clusters with: kops get cluster
+    Edit this cluster with: kops edit cluster useast1.k8s.appychip.vpc
+    Edit your node instance group: kops edit ig --name=useast1.k8s.appychip.vpc nodes
+    Edit your master instance group: kops edit ig --name=useast1.k8s.appychip.vpc master-us-east-1d
+
+It will take some time for the instances to boot and the DNS entries to be added in the zone. Once everything is up you should be able to get the kubernetes nodes:
+
+kubectl get nodes
+
+NAME                          STATUS AGE VERSION
+ip-172-20-33-144.ec2.internal Ready  4m  v1.6.2
+ip-172-20-39-78.ec2.internal  Ready  1m  v1.6.2
+ip-172-20-45-174.ec2.internal Ready  2m  v1.6.2
+
+To enable the Kubernetes UI you need to install the UI service:
+kubectl create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml
+
+Then you can use the kubctl proxy to access the UI from your machine:
+kubectl proxy --port=8080 &

@@ -1,0 +1,12 @@
+CIRCLECI
+1. i use circleci for automate the web application when code push from github and it will deploy to aws.
+   in which in use node docker image container , restore cache for package.json and yarn.lock because yarn command is using in this app
+   also save the cache for circleci to build the application. i use aws access key and secret key for deploy me code in to aws
+2. we can set env variable in circlici ui  
+3. i have correct the package.json scripts error which we are using for start our app.
+4. also add the node modules for dependencies.
+5. i have use ansible for set up database and move my code to aws account.
+6. i have use kops for create the cluster of kubernetes.
+7. i can use zabbix monitoring service for manage my web site download speed my database crash or stop timing
+8. i have make backup bash script for get auto backup of code and database.
+ 
